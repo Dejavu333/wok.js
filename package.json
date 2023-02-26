@@ -1,0 +1,27 @@
+{
+  "name": "bel.js",
+  "version": "1.0.0",
+  "description": "Minimalist frontend framework.",
+  "main": "bel.js",
+  "scripts": {
+    "bel" : "node bel.js",
+    "ring" : "node newBel.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Vasvary Botond",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "escodegen": "^2.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dejavu333/bel.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Dejavu333/bel.js/issues"
+  },
+  "homepage": "https://github.com/Dejavu333/bel.js#readme"
+}
