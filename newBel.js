@@ -7,24 +7,17 @@ if (!filename) {
   process.exit(1);
 }
 
-const bell = `
-<script>
-
+const bell = 
+`<script>
 /* behaviour, state */
-
 </script>
 
 <${filename}-bel>
-
 <!-- structure -->
-
 </${filename}-bel>
 
 <style>
-
 /* appearance */
+</style>`;
 
-</style>
-`;
-
-fs.writeFileSync(`${filename}-bell.html`, bell, 'utf8');
+fs.writeFileSync(`${filename}-bel.html`, bell, 'utf8');
