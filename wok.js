@@ -112,11 +112,11 @@ class Visitor {
 }
 
 // const args = process.argv[2] // pull in the cmd line args
-// if (!fs.existsSync(args) || !args.endsWith('-bel.html')) {
-//     out('Error: File does not exist or is not a ???-bel.html file')
+// if (!fs.existsSync(args) || !args.endsWith('-wok.html')) {
+//     out('Error: File does not exist or is not a ???-wok.html file')
 //     process.exit(1)
 // }
-// const buffer = fs.readFileSync(args).toString() //node index.js test/t-bel.html
+// const buffer = fs.readFileSync(args).toString() //node index.js test/t-wok.html
 
 
 //==================================================================================
@@ -182,7 +182,7 @@ function addGettersAndSetters(p_props) {
 function addComponentBasedEventListeners(p_events) {
     let eventListeners = "";
     p_events.forEach(event => {
-        if (!event.includes("-bel")) return;
+        if (!event.includes("-wok")) return;
         const handler = event.split('addEventListener')[1];
         let listener = `this.addEventListener`;
         listener += handler;
@@ -209,7 +209,7 @@ function deployComponent(p_dirPath, p_components) {
         if (info.isDirectory()) {
             deployComponent(filePath, p_components);
         }
-        else if (file.endsWith('.html') && !file.endsWith('-bel.html')) {
+        else if (file.endsWith('.html') && !file.endsWith('-wok.html')) {
 
             let componentQuery = '';
             for (const component of p_components) {
@@ -220,12 +220,12 @@ function deployComponent(p_dirPath, p_components) {
             const html = fs.readFileSync(filePath).toString();
             const $ = cheerio.load(html);
 
-            // Find the script tag with the 'id' attribute set to 'bel'
-            const scriptTag = $('script#bel-generated');
+            // Find the script tag with the 'id' attribute set to 'wok'
+            const scriptTag = $('script#wok-generated');
 
             // If the script tag doesn't exist, create a new one and append it to the head section
             if (scriptTag.length === 0) {
-            $('head').append(`<script id="bel-generated">${componentQuery}</script>`);
+            $('head').append(`<script id="wok-generated">${componentQuery}</script>`);
             } else {
             // Replace the contents of the existing script tag with your component query
             scriptTag.text(componentQuery);
@@ -249,15 +249,15 @@ function customComponents(p_dirPath) {
         if (info.isDirectory()) {
             customComponents(filePath);
         }
-        else if (file.endsWith('-bel.html')) {
+        else if (file.endsWith('-wok.html')) {
 
             //----------------------------------------------
             // Get the script, div, and style parts
             //----------------------------------------------
             const buffer = fs.readFileSync(filePath).toString();
-            G.componentName = buffer.match(/<.*-bel/)[0].split('<')[1];
+            G.componentName = buffer.match(/<.*-wok/)[0].split('<')[1];
             G.script = buffer.split('<script>')[1].split('</script>')[0];
-            G.divTemplate = buffer.match(/<.*-bel>([\s\S]*)<\/.*-bel>/)[1];
+            G.divTemplate = buffer.match(/<.*-wok>([\s\S]*)<\/.*-wok>/)[1];
             G.styleTemplate = buffer.split('<style>')[1].split('</style>')[0];
 
             /* puts this. in front of members */

@@ -7,17 +7,19 @@ if (!filename) {
   process.exit(1);
 }
 
-const bell = 
+const wok = 
 `<script>
 /* behaviour, state */
 </script>
 
-<${filename}-bel>
+
+<${filename}-wok>
 <!-- structure -->
-</${filename}-bel>
+</${filename}-wok>
+
 
 <style>
 /* appearance */
 </style>`;
 
-fs.writeFileSync(`${filename}-bel.html`, bell, 'utf8');
+fs.writeFileSync(`${filename}-wok.html`, wok, 'utf8');
