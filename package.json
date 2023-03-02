@@ -1,21 +1,25 @@
 {
   "name": "wok.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Minimalist frontend framework.",
   "main": "wok.js",
   "scripts": {
-    "wok" : "node wok.js",
-    "add" : "node newWok.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "wok": "concurrently \" node wok.js && npm run live\" \"npm run observer\"",
+    "add": "node newWok.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "live": "live-server --port=9000 --entry-file=index.html",
+    "observer": "nodemon --watch woks --ext html wok.js"
   },
   "keywords": [],
   "author": "Vasvary Botond",
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "escodegen": "^2.0.0"
+    "concurrently": "^7.6.0",
+    "escodegen": "^2.0.0",
+    "live-server": "^1.2.2",
+    "nodemon": "^2.0.20"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dejavu333/wok.js.git"
