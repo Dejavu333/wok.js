@@ -7,6 +7,13 @@ if (!filename) {
   process.exit(1);
 }
 
+// if the file with that name alrady exists logs error and exits
+if(fs.existsSync(`./_src/_woks/${filename}-wok.html`)){
+  console.log('Error: A wok with that name already exists');
+  process.exit(1);
+}
+
+// wok template
 const wok = 
 `<script>
 /* behaviour, state */
@@ -22,4 +29,4 @@ const wok =
 /* appearance */
 </style>`;
 
-fs.writeFileSync(`${filename}-wok.html`, wok, 'utf8');
+fs.writeFileSync(`./src/woks/${filename}-wok.html`, wok, 'utf8');

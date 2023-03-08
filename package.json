@@ -3,12 +3,17 @@
   "version": "1.0.1",
   "description": "Minimalist frontend framework.",
   "main": "wok.js",
+  "bin": {
+    "wok": "npm run fry"
+  },
   "scripts": {
+    "fry": "node newWok.js",
     "wok": "concurrently \" node wok.js && npm run live\" \"npm run observer\"",
-    "add": "node newWok.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "live": "live-server --port=9000 --entry-file=index.html",
-    "observer": "nodemon --watch woks --ext html wok.js"
+
+    "live": "live-server --port=9000 --entry-file=./wokBuild/index.html",
+    "observer": "nodemon --watch woks --ext html wok.js",
+
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Vasvary Botond",
