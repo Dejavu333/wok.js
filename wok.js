@@ -2,26 +2,25 @@
 // Import the modules, init globals
 //==================================================================================
 const out = console.log;
-// // const acorn = require('acorn');
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const esprisma = require('esprima');
 const escodegen = require('escodegen');
-//!notes: templating language will be needed
+// todo templating language will be needed
 
 
 //==================================================================================
 // Globals
 //==================================================================================
 const G = {
-    componentName : "",
-    script : "",
-    props : [],
-    events : [],
-    methods : [],
-    styleTemplate : "",
-    divTemplate : "",
+    componentName: "",
+    script: "",
+    props: [],
+    events: [],
+    methods: [],
+    styleTemplate: "",
+    divTemplate: "",
 }
 const components = [];
 
@@ -38,7 +37,6 @@ class Interpreter {
     }
     interpret(p_astNodes) {
         p_astNodes.forEach(node => {
-            // console.log(node, JSON.stringify(node, null, 2))
             this.visitor.visit(node)
         })
     }
@@ -49,18 +47,18 @@ class Visitor {
         if (p_node.type === 'VariableDeclaration') {
             this.visitVariableDeclaration(p_node)
         }
-        // if (p_node.type === 'VariableDeclarator') {
-        //     this.visitVariableDeclarator(p_node)
-        // }
-        // if (p_node.type === 'BinaryExpression') {
-        //     this.visitBinaryExpression(p_node)
-        // }
-        // if (p_node.type === 'Literal') {
-        //     this.visitLiteral(p_node)
-        // }
-        // if (p_node.type === 'Identifier') {
-        //     this.visitIdentifier(p_node)
-        // }
+        // // if (p_node.type === 'VariableDeclarator') {
+        // //     this.visitVariableDeclarator(p_node)
+        // // }
+        // // if (p_node.type === 'BinaryExpression') {
+        // //     this.visitBinaryExpression(p_node)
+        // // }
+        // // if (p_node.type === 'Literal') {
+        // //     this.visitLiteral(p_node)
+        // // }
+        // // if (p_node.type === 'Identifier') {
+        // //     this.visitIdentifier(p_node)
+        // // }
         if (p_node.type === 'FunctionDeclaration') {
             this.visitFunctionDeclaration(p_node)
         }
@@ -78,7 +76,7 @@ class Visitor {
 
         // // })
         const prop = escodegen.generate(p_node);
-        if(!prop.includes("_")) return;
+        if (!prop.includes("_")) return;
         G.props.push(prop);
     }
 
@@ -86,42 +84,43 @@ class Visitor {
         const method = escodegen.generate(p_node);
         G.methods.push(method);
     }
-    
+
     //events
     visitExpressionStatement(p_node) {
         if (p_node.expression.callee.property.name == "addEventListener" || p_node.expression.callee.property.name == "on") {
-            // // out(JSON.stringify(p_node, null, 2))
             const event = escodegen.generate(p_node);
             G.events.push(event);
         }
     }
-    // visitVariableDeclarator(p_node) {
-    //     this.visit(p_node.id)
-    //     this.visit(p_node.init)
-    // }
-    // visitBinaryExpression(p_node) {
-    //     this.visit(p_node.left)
-    //     this.visit(p_node.right)
-    // }
-    // visitLiteral(p_node) {
-    //     out(p_node.value)
-    // }
-    // visitIdentifier(p_node) {
-    //     out(p_node.name)
-    // }
+    // // visitVariableDeclarator(p_node) {
+    // //     this.visit(p_node.id)
+    // //     this.visit(p_node.init)
+    // // }
+    // // visitBinaryExpression(p_node) {
+    // //     this.visit(p_node.left)
+    // //     this.visit(p_node.right)
+    // // }
+    // // visitLiteral(p_node) {
+    // //     out(p_node.value)
+    // // }
+    // // visitIdentifier(p_node) {
+    // //     out(p_node.name)
+    // // }
 }
 
-// const args = process.argv[2] // pull in the cmd line args
-// if (!fs.existsSync(args) || !args.endsWith('-wok.html')) {
-//     out('Error: File does not exist or is not a ???-wok.html file')
-//     process.exit(1)
-// }
-// const buffer = fs.readFileSync(args).toString() //node index.js test/t-wok.html
+// // const args = process.argv[2] // pull in the cmd line args
+// // if (!fs.existsSync(args) || !args.endsWith('-wok.html')) {
+// //     out('Error: File does not exist or is not a ???-wok.html file')
+// //     process.exit(1)
+// // }
+// // const buffer = fs.readFileSync(args).toString() //node index.js test/t-wok.html
 
 
 //==================================================================================
 // Main
 //==================================================================================
+// todo remove everything from _build folder
+copyFiles("./_src", "./_build");
 const comps = customComponents("./_src");
 deployComponent("./_build", comps);
 
@@ -144,17 +143,17 @@ function addGettersAndSetters(p_props) {
             propValue = prop.split('=')[1].split(';')[0];
             propValue = propValue.replace(/_/g, "this._");
         } catch (error) { console.log(error) }
-        
-        try {propName = prop.split(' ')[1].split(';')[0];} catch (error) { console.log(error) }
+
+        try { propName = prop.split(' ')[1].split(';')[0]; } catch (error) { console.log(error) }
 
         //--------------------------------------------------
         // Getter
         //--------------------------------------------------
-        let getterBody; 
+        let getterBody;
         /* if the property has no default value, then the getter will return the attribute value which can be set by the user in the html tag */
-        if(!propValue) getterBody = `return this.getAttribute('${propName}');`;
+        if (!propValue) getterBody = `return this.getAttribute('${propName}');`;
         /* if the property has default value, then the getter will return the default value (it can be an expression) */
-        else if(propValue) getterBody = `
+        else if (propValue) getterBody = `
         if(this.getAttribute('${propName}') == null) {this.setAttribute('${propName}', ${propValue});}
         return this.getAttribute('${propName}');`;
 
@@ -168,7 +167,7 @@ function addGettersAndSetters(p_props) {
         //--------------------------------------------------
         /* if the property is not a constant, then the setter will set the attribute value */
         if (!prop.includes("const")) {
-            
+
             gettersAndSetters += `
             set ${propName}(value) {
                 this.setAttribute('${propName}', value);
@@ -199,6 +198,17 @@ function addMethods(p_methods) {
     return methodsString;
 }
 
+function copyFiles(p_from, p_to) {
+
+    const files = fs.readdirSync(p_from);
+    files.forEach((file) => {
+        if (file == "_woks") return;
+        const fromFilePath = path.join(p_from, file);
+        const toFilePath = path.join(p_to, file);
+        fs.copyFileSync(fromFilePath, toFilePath);
+    });
+}
+
 function deployComponent(p_dirPath, p_components) {
 
     const files = fs.readdirSync(p_dirPath);
@@ -225,10 +235,10 @@ function deployComponent(p_dirPath, p_components) {
 
             // If the script tag doesn't exist, create a new one and append it to the head section
             if (scriptTag.length === 0) {
-            $('head').append(`<script id="wok-generated">${componentQuery}</script>`);
+                $('head').append(`<script id="wok-generated">${componentQuery}</script>`);
             } else {
-            // Replace the contents of the existing script tag with your component query
-            scriptTag.text(componentQuery);
+                // Replace the contents of the existing script tag with your component query
+                scriptTag.text(componentQuery);
             }
 
             // Write the modified HTML file back to disk
@@ -239,10 +249,9 @@ function deployComponent(p_dirPath, p_components) {
 
 function customComponents(p_dirPath) {
 
-
     const files = fs.readdirSync(p_dirPath);
     files.forEach((file) => {
-        if(file == "node_modules") return;
+        if (file == "node_modules") return;
         const filePath = path.join(p_dirPath, file);
         const info = fs.statSync(filePath);
 
@@ -271,7 +280,6 @@ function customComponents(p_dirPath) {
             //----------------------------------------------
             // Lexical analysis, Parsing to AST
             //----------------------------------------------
-            // // const ast = acorn.parse(G.script).body
             const ast = esprisma.parseScript(G.script).body
             out("AST----------------------------------AST")
             out(ast);

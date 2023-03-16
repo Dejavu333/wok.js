@@ -1,17 +1,18 @@
 {
   "name": "wok.js",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Minimalist frontend framework.",
   "main": "wok.js",
   "bin": {
-    "wok": "npm run fry"
+    "npm run wokinit": "./init.js"
   },
+  "preferGlobal": true,
   "scripts": {
     "fry": "node newWok.js",
     "wok": "concurrently \" node wok.js && npm run live\" \"npm run observer\"",
 
-    "live": "live-server --port=9000 --entry-file=./wokBuild/index.html",
-    "observer": "nodemon --watch woks --ext html wok.js",
+    "live": "live-server --port=9000 --entry-file=./_build/index.html",
+    "observer": "nodemon --watch ./_src --ext html,js,css wok.js",
 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
