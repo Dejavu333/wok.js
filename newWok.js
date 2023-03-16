@@ -29,4 +29,4 @@ const wok =
 /* appearance */
 </style>`;
 
-fs.writeFileSync(`./src/woks/${filename}-wok.html`, wok, 'utf8');
+fs.writeFileSync(`./_src/_woks/${filename}-wok.html`, wok, 'utf8');
