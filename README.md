@@ -2,10 +2,12 @@
               
 Minimalist framework instead of Angular,React,Vue,Solid,Svelte,Lit
 
-npm run add yourCustomComponentName
+npm install -g wokjs
 
-npm run wok
-
+navigate to a folder of your choice
+type    wokproj                  into your terminal to create a wokjs project
+type    npm run wok itsname      to create a new wok
+type    npm run fry              to start your wokjs application live
 
 
 # TODO
