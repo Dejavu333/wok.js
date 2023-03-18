@@ -6,11 +6,11 @@ npm install -g wokjs
 
 Navigate to a folder of your choice then:
 
-type    wokproj                  into your terminal to create a wokjs project
+type    **wokproj**                  into your terminal to create a wokjs project
 
-type    npm run wok itsname      to create a new wok
+type    **npm run wok itsname**      to create a new wok
 
-type    npm run fry              to start your wokjs application live
+type    **npm run fry**              to start your wokjs application live
 
 
 # TODO
