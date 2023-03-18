@@ -1,0 +1,32 @@
+<script>
+    let _x;
+    let _y = 10 * _x;
+    let _z = Math.sqrt(_y);
+    let _color = "green";
+</script>
+
+
+<example-wok>
+        <h1>wok</h1>
+        <lu>
+            <li>${_x}</li>
+            <li>${_y}</li>
+            <li>${_z}</li>
+            <li>${_x + _y / _z}</li>
+        </lu>
+</example-wok>
+
+
+<style>
+    :host {
+        display: block;
+        height: 10%;
+        width: 20%;
+        border: 4px solid black;
+        padding: 10px;
+    }
+    h1 {
+        color: ${_color};
+    };
+    
+</style>

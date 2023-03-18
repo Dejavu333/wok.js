@@ -2,9 +2,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample wok project</title>
+    <title>Sample project</title>
 <script id="wok-generated">
-            class mycomp_wok extends HTMLElement {
+            class example_wok extends HTMLElement {
                 styleTemplate;
                 divTemplate;
                 shadow;
@@ -49,19 +49,26 @@
 
                 render() {   
                     this.styleTemplate =`<style>
+    :host {
+        display: block;
+        height: 10%;
+        width: 20%;
+        border: 4px solid black;
+        padding: 10px;
+    }
     h1 {
         color: ${this._color};
     };
     
 </style>`;
                     this.divTemplate =`
-    <h1>wok.js</h1>
-    <lu>
-        <li>${this._x}</li>
-        <li>${this._y}</li>
-        <li>${this._z}</li>
-        <li>${this._x + this._y / this._z}</li>
-    </lu>
+        <h1>wok</h1>
+        <lu>
+            <li>${this._x}</li>
+            <li>${this._y}</li>
+            <li>${this._z}</li>
+            <li>${this._x + this._y / this._z}</li>
+        </lu>
 `;
                     this.shadow.innerHTML = this.styleTemplate + this.divTemplate;
                 }
@@ -93,12 +100,12 @@
 
             }
 
-            customElements.define('mycomp-wok', mycomp_wok);</script></head>
+            customElements.define('example-wok', example_wok);</script></head>
 
     <body>
         
-        <mycomp-wok _x="10" _color="blue">
+        <example-wok _x="10" _color="blue">
 
     
 
-</mycomp-wok></body></html>
+</example-wok></body></html>
