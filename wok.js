@@ -24,6 +24,7 @@ const G = {
 }
 const components = [];
 
+
 //==================================================================================
 // Classes
 //==================================================================================
@@ -119,7 +120,7 @@ class Visitor {
 //==================================================================================
 // Main
 //==================================================================================
-// todo remove everything from _build folder
+purgeDir("./_build");
 copyFiles("./_src", "./_build");
 const comps = customComponents("./_src");
 deployComponent("./_build", comps);
@@ -128,6 +129,23 @@ deployComponent("./_build", comps);
 //==================================================================================
 // Functions
 //==================================================================================
+function purgeDir(folderPath) {
+    if (fs.existsSync(folderPath)) {
+      fs.readdirSync(folderPath).forEach((file, index) => {
+        const curPath = path.join(folderPath, file);
+        if (fs.lstatSync(curPath).isDirectory()) {
+          // Recursively deletes subdirectories
+          purgeDir(curPath);
+        } else {
+          // Deletes file
+          fs.unlinkSync(curPath);
+        }
+      });
+      // Deletes the empty directory
+      fs.rmdirSync(folderPath);
+    }
+  }
+
 function addGettersAndSetters(p_props) {
 
     let gettersAndSetters = "";
@@ -199,6 +217,11 @@ function addMethods(p_methods) {
 }
 
 function copyFiles(p_from, p_to) {
+
+    //if the path doesn't exist creates it
+    if (!fs.existsSync(p_to)) {
+        fs.mkdirSync(p_to);
+    }
 
     const files = fs.readdirSync(p_from);
     files.forEach((file) => {

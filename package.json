@@ -12,7 +12,7 @@
     "fry": "concurrently \" node wok.js && npm run live\" \"npm run observer\"",
 
     "live": "live-server --port=9000 --entry-file=./_build/index.html",
-    "observer": "nodemon --watch ./_src --ext html,js,css wok.js",
+    "observer": "nodemon --watch ./_src --ext html,js,css --ignore node_modules wok.js",
 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
