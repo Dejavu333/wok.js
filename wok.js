@@ -123,7 +123,7 @@ class Visitor {
 purgeDir("./_build");
 copyFiles("./_src", "./_build");
 const comps = customComponents("./_src");
-deployComponent("./_build", comps);
+deployComponents(comps, "./_build");
 
 
 //==================================================================================
@@ -232,15 +232,15 @@ function copyFiles(p_from, p_to) {
     });
 }
 
-function deployComponent(p_dirPath, p_components) {
+function deployComponents(p_components,p_toDirPath) {
 
-    const files = fs.readdirSync(p_dirPath);
+    const files = fs.readdirSync(p_toDirPath);
     files.forEach((file) => {
-        const filePath = path.join(p_dirPath, file);
+        const filePath = path.join(p_toDirPath, file);
         const info = fs.statSync(filePath);
 
         if (info.isDirectory()) {
-            deployComponent(filePath, p_components);
+            deployComponents(filePath, p_components);
         }
         else if (file.endsWith('.html') && !file.endsWith('-wok.html')) {
 
@@ -270,12 +270,12 @@ function deployComponent(p_dirPath, p_components) {
     });
 }
 
-function customComponents(p_dirPath) {
+function customComponents(p_toDirPath) {
 
-    const files = fs.readdirSync(p_dirPath);
+    const files = fs.readdirSync(p_toDirPath);
     files.forEach((file) => {
         if (file == "node_modules") return;
-        const filePath = path.join(p_dirPath, file);
+        const filePath = path.join(p_toDirPath, file);
         const info = fs.statSync(filePath);
 
         if (info.isDirectory()) {
