@@ -1,8 +1,10 @@
 const fs = require('fs');
 const args = process.argv.slice(2);
-const filename = args[0];
+const targetDirectory = args[0];
+const filename = args[1];
 
-if (!filename) {
+
+if (!filename || filename === "undefined") {
   console.log('\x1b[31m','Error:','\x1b[37m','No filename was specified');
   process.exit(1);
 }
@@ -14,7 +16,7 @@ if (/[A-Z]/.test(filename)) {
 }
 
 // if the file with that name alrady exists logs error and exits
-if(fs.existsSync(`./_src/_woks/${filename}-wok.html`)){
+if(fs.existsSync(`${targetDirectory}/${filename}-wok.html`)){
   console.log('\x1b[31m','Error:','\x1b[37m','A wok with that name already exists');
   process.exit(1);
 }
@@ -35,4 +37,4 @@ const wok =
 /* appearance */
 </style>`;
 
-fs.writeFileSync(`./_src/_woks/${filename}-wok.html`, wok, 'utf8');
+fs.writeFileSync(`${targetDirectory}/${filename}-wok.html`, wok, 'utf8');

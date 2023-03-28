@@ -120,19 +120,27 @@ class Visitor {
 //==================================================================================
 // Main
 //==================================================================================
-purgeDir("./_build");
-copyFiles("./_src", "./_build");
-const comps = customComponents("./_src");
-deployComponents(comps, "./_build");
+out("Fry is running...");
+const args = process.argv.slice(2);
+const targetDirectory = args[0];
+out("targetdir: "+targetDirectory);
+out("purging previous build...");
+purgeDir(targetDirectory+"/_build");
+out("copying source files...");
+copyFiles(targetDirectory+"/_src", targetDirectory+"/_build");
+out("parsing woks...");
+const comps = customComponents(targetDirectory+"/_src");
+out("deploying woks...");
+deployComponents(comps, targetDirectory+"/_build");
 
 
 //==================================================================================
 // Functions
 //==================================================================================
-function purgeDir(folderPath) {
-    if (fs.existsSync(folderPath)) {
-      fs.readdirSync(folderPath).forEach((file, index) => {
-        const curPath = path.join(folderPath, file);
+function purgeDir(p_dirPath) {
+    if (fs.existsSync(p_dirPath)) {
+      fs.readdirSync(p_dirPath).forEach((file, index) => {
+        const curPath = path.join(p_dirPath, file);
         if (fs.lstatSync(curPath).isDirectory()) {
           // Recursively deletes subdirectories
           purgeDir(curPath);
@@ -142,9 +150,9 @@ function purgeDir(folderPath) {
         }
       });
       // Deletes the empty directory
-      fs.rmdirSync(folderPath);
+      fs.rmdirSync(p_dirPath);
     }
-  }
+}
 
 function addGettersAndSetters(p_props) {
 
@@ -270,12 +278,12 @@ function deployComponents(p_components,p_toDirPath) {
     });
 }
 
-function customComponents(p_toDirPath) {
+function customComponents(p_fromDirPath) {
 
-    const files = fs.readdirSync(p_toDirPath);
+    const files = fs.readdirSync(p_fromDirPath);
     files.forEach((file) => {
         if (file == "node_modules") return;
-        const filePath = path.join(p_toDirPath, file);
+        const filePath = path.join(p_fromDirPath, file);
         const info = fs.statSync(filePath);
 
         if (info.isDirectory()) {

@@ -1,19 +1,15 @@
 {
   "name": "wok.js",
-  "version": "1.1.7",
+  "version": "1.1.42",
   "description": "Minimalist frontend framework.",
   "main": "wok.js",
   "bin": {
-    "wokproj": "./init.js"
+    "wok": "./newWokWrapperScript.js",
+    "wokproj": "./initWokProj.js",
+    "fry": "./fryWrapperScript.js"
   },
   "preferGlobal": true,
   "scripts": {
-    "wok": "node newWok.js",
-    "fry": "concurrently \" node wok.js && npm run live\" \"npm run observer\"",
-
-    "live": "live-server --port=9000 --entry-file=./_build/index.html",
-    "observer": "nodemon --watch ./_src --ext html,js,css --ignore node_modules wok.js",
-
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,10 +17,9 @@
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "concurrently": "^7.6.0",
     "escodegen": "^2.0.0",
     "live-server": "^1.2.2",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.22"
   },
   "repository": {
     "type": "git",

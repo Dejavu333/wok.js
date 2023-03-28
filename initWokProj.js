@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-// Copies essential files to the current working directory from root where the package gets installed
+/* Copies essential files to the current working directory from root where the package gets installed */
 const fs = require('fs');
 const path = require('path');
 
 const callerPath = process.cwd();
-const sourcePath = path.join(__dirname);
+const calleePath = path.join(__dirname);
 
-copyFilesRecursive(sourcePath, callerPath);
+copyFilesRecursive(calleePath+"/_src", callerPath+"/_src");
+copyFilesRecursive(calleePath+"/_build", callerPath+"/_build");
 
 function copyFilesRecursive(source, target) {
   // Create target directory if it doesn't exist
@@ -18,7 +19,6 @@ function copyFilesRecursive(source, target) {
   // Iterate through all files and subdirectories in source directory
   const files = fs.readdirSync(source);
   files.forEach(file => {
-    if (file !== "init.js") {
       const sourcePath = path.join(source, file);
       const targetPath = path.join(target, file);
 
@@ -29,6 +29,5 @@ function copyFilesRecursive(source, target) {
         // Copy file to target directory
         fs.copyFileSync(sourcePath, targetPath);
       }
-    }
   });
 }
