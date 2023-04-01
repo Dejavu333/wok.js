@@ -8,9 +8,9 @@ Navigate to a folder of your choice then:
 
 type    **wokproj**                  into your terminal to create a wok.js project (Win11: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted)
 
-type    **npm run wok itsname**      to create a new wok
+type    **wok itsname**      to create a new wok
 
-type    **npm run fry**              to start your wokjs application live
+type    **fry**              to start your wokjs application live
 
 
 # TODO
