@@ -2,15 +2,13 @@
               
 Minimalist framework instead of Angular,React,Vue,Solid,Svelte,Lit
 
-**npm install -g wok.js**
+- type **npm install -g wok.js** to install the package globally
 
-Navigate to a folder of your choice then:
+- type    **wokproj**                  into your terminal to create a wok.js project (Win11: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted)
 
-type    **wokproj**                  into your terminal to create a wok.js project (Win11: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted)
+- type    **wok somename**      to create a new wok
 
-type    **wok somename**      to create a new wok
-
-type    **fry**              to start your wokjs application live
+- type    **fry**              to start your wok.js application
 
 
 # TODO
