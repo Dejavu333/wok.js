@@ -2,7 +2,6 @@
 
 /* wrapper script that calls the script that calls the npm run fry command, thus the script becomes available globally on the os */
 const { exec } = require('child_process');
-const { spawn } = require('child_process');
 let callerPath = process.cwd();
 let calleePath = __dirname;
   console.log("caller:"+callerPath);

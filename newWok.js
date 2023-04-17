@@ -3,7 +3,6 @@ const args = process.argv.slice(2);
 const targetDirectory = args[0];
 const filename = args[1];
 
-
 if (!filename || filename === "undefined") {
   console.log('\x1b[31m','Error:','\x1b[37m','No filename was specified');
   process.exit(1);
@@ -24,17 +23,25 @@ if(fs.existsSync(`${targetDirectory}/${filename}-wok.html`)){
 // wok template
 const wok = 
 `<script>
-/* behaviour, state */
+//----------------------------
+//properties
+
+//----------------------------
+//functions
+
+//----------------------------
+//events
+
 </script>
 
 
 <${filename}-wok>
-<!-- structure -->
+
 </${filename}-wok>
 
 
 <style>
-/* appearance */
+
 </style>`;
 
 fs.writeFileSync(`${targetDirectory}/${filename}-wok.html`, wok, 'utf8');

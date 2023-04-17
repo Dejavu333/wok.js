@@ -18,9 +18,19 @@ const G = {
     script: "",
     props: [],
     events: [],
+    bornEvents: [],
+    deathEvents: [],
     methods: [],
     styleTemplate: "",
     divTemplate: "",
+
+    BORN_EVENT_LABEL: "born",
+    DEATH_EVENT_LABEL: "death",
+    EVENT_LISTENER_LABELS: ["addEventListener", "on"]
+    //REACTIVE_SIGN
+    //BUILD_DIR_PATH
+    //SRC_DIR_PATH
+    //COMPONENTS_DIR_PATH
 }
 const components = [];
 
@@ -29,9 +39,9 @@ const components = [];
 // Classes
 //==================================================================================
 class Interpreter {
-    set x(p_x) {
-        this._x = p_x
-    }
+    // set x(p_x) {
+    //     this._x = p_x
+    // }
 
     constructor(p_visitor) {
         this.visitor = p_visitor
@@ -86,11 +96,21 @@ class Visitor {
         G.methods.push(method);
     }
 
-    //events
     visitExpressionStatement(p_node) {
-        if (p_node.expression.callee.property.name == "addEventListener" || p_node.expression.callee.property.name == "on") {
-            const event = escodegen.generate(p_node);
-            G.events.push(event);
+        //events
+        if (G.EVENT_LISTENER_LABELS.includes(p_node.expression.callee.property.name)) {
+            if(G.BORN_EVENT_LABEL === p_node.expression.arguments[0].value) {
+                //extract the function
+                const func = escodegen.generate(p_node.expression.arguments[1]);
+                G.bornEvents.push(func);
+            } else if (G.DEATH_EVENT_LABEL === p_node.expression.arguments[0].value) {
+                //extract the function
+                const func = escodegen.generate(p_node.expression.arguments[1]);
+                G.deathEvents.push(func);
+            } else {
+                const event = escodegen.generate(p_node);
+                G.events.push(event);
+            }
         }
     }
     // // visitVariableDeclarator(p_node) {
@@ -120,18 +140,21 @@ class Visitor {
 //==================================================================================
 // Main
 //==================================================================================
-out("Fry is running...");
+out("fry is running...");
 const args = process.argv.slice(2);
-const targetDirectory = args[0];
-out("targetdir: "+targetDirectory);
+const targetDirPath = args[0];
+
 out("purging previous build...");
-purgeDir(targetDirectory+"/_build");
+purgeDir(targetDirPath+"/_build");
+
 out("copying source files...");
-copyFiles(targetDirectory+"/_src", targetDirectory+"/_build");
-out("parsing woks...");
-const comps = customComponents(targetDirectory+"/_src");
+copyFiles(targetDirPath+"/_src", targetDirPath+"/_build");
+
+out("parsing...");
+const comps = customComponents(targetDirPath+"/_src");
+
 out("deploying woks...");
-deployComponents(comps, targetDirectory+"/_build");
+deployComponents(comps, targetDirPath+"/_build");
 
 
 //==================================================================================
@@ -200,43 +223,82 @@ function addGettersAndSetters(p_props) {
             }`;
         }
 
-    });//forEach ends
+    });// forEach ends
     return gettersAndSetters;
 }
 
-function addComponentBasedEventListeners(p_events) {
+function addEventListeners(p_events, p_wokName) {
     let eventListeners = "";
     p_events.forEach(event => {
-        if (!event.includes("-wok")) return;
-        const handler = event.split('addEventListener')[1];
-        let listener = `this.addEventListener`;
-        listener += handler;
+        /* splits only at the first occurence of "addEventListener" */
+        const eventListenerParts = event.split('.addEventListener',2);
+        let listener = eventListenerParts[0];
+        eventListenerParts[1]= eventListenerParts[1].replace(/(?<!\.)_/g,`document.querySelector('${p_wokName}')._`);
+        event = listener + ".addEventListener" + eventListenerParts[1];
+        /* if the listener is the wok itself so select('example-wok').addEventListener(...), then the listener will be "this" */
+        // // let handler = ".addEventListener" + eventListenerParts[1];
+        const eventListenerWithCondition = `if(${listener}){
+            
+            ${event}
+        }`;
+        eventListeners += eventListenerWithCondition;
     });
     return eventListeners;
 }
 
-function addMethods(p_methods) {
+function addLifeCycleEvents(p_lifeCycleEvents) {
+    let lifeCycleEventsQuery = "";
+    if (p_lifeCycleEvents.length > 0) {
+      p_lifeCycleEvents.forEach(event => {
+        lifeCycleEventsQuery +=`(${event})();` ;
+      });
+    }
+    return lifeCycleEventsQuery;
+}
+
+function addMethods(p_methods, p_wokName) {
     let methodsString = "";
     p_methods.forEach(method => {
         method = method.replace('function', '');
-        methodsString += method;
+        methodParts = method.split('{',2);
+        methodParts[1]= methodParts[1].replace(/(?<!\.)_/g,`document.querySelector('${p_wokName}')._`);
+        methodsString +=( methodParts[0] + '{' + methodParts[1] );
     });
     return methodsString;
 }
 
-function copyFiles(p_from, p_to) {
 
-    //if the path doesn't exist creates it
-    if (!fs.existsSync(p_to)) {
-        fs.mkdirSync(p_to);
+function copyFiles(p_fromDirectory, p_toDirectory) {
+
+    /* if the path doesn't exist creates it */
+    if (!fs.existsSync(p_toDirectory)) {
+        fs.mkdirSync(p_toDirectory);
     }
 
-    const files = fs.readdirSync(p_from);
+    const files = fs.readdirSync(p_fromDirectory);
     files.forEach((file) => {
+        //sad path
         if (file == "_woks") return;
-        const fromFilePath = path.join(p_from, file);
-        const toFilePath = path.join(p_to, file);
-        fs.copyFileSync(fromFilePath, toFilePath);
+
+        //happy path
+        const fromFilePath = path.join(p_fromDirectory, file);
+        const toFilePath = path.join(p_toDirectory, file);
+
+        /* if the file is a file, parse content and copy it */
+        if (fs.statSync(fromFilePath).isFile()) {
+            if (!file.endsWith('.js') && !file.endsWith('.html')) {
+                fs.copyFileSync(fromFilePath, toFilePath);
+                return;
+            }
+            const content = fs.readFileSync(fromFilePath).toString();
+            const parsedContent = resolvedSyntax(content, false);
+            
+            fs.writeFileSync(toFilePath, parsedContent);
+        }
+        /* if the file is a directory, copy it */
+        if (fs.statSync(fromFilePath).isDirectory()) {
+            copyFiles(fromFilePath, toFilePath);
+        }
     });
 }
 
@@ -278,8 +340,49 @@ function deployComponents(p_components,p_toDirPath) {
     });
 }
 
-function customComponents(p_fromDirPath) {
+function resolvedSyntax(p_content, p_isWok, p_wokName) {
+    let  replacedContent = p_content;
 
+    // .on -> .addEventListener
+    // .off -> .removeEventListener
+    replacedContent = replacedContent 
+    .replace(/\.on\(/g, '.addEventListener(')
+    .replace(/\.off\(/g, '.removeEventListener(')
+    .replace(/\.select\(/g, '.querySelector(')
+    .replace(/\.selectAll\(/g, '.querySelectorAll(');
+
+    if (!p_isWok) {
+        // select -> document.querySelector
+        // selectAll -> document.querySelectorAll
+        replacedContent = replacedContent
+        .replace(/select\(/g, 'document.querySelector(')
+        .replace(/selectAll\(/g, 'document.querySelectorAll(');
+    } else if (p_isWok) {
+        // select -> this.shadowRoot.querySelector
+        // selectAll -> this.shadowRoot.querySelectorAll
+        replacedContent = replacedContent
+         // .replace(/(?<!\.)/g, `document.querySelector('${p_wokName}')._`) //if the _ is not preceded by a dot
+        .replace(/select\(/g, `document.querySelector('${p_wokName}').shadow.querySelector(`)
+        .replace(/selectAll\(/g, `document.querySelector('${p_wokName}').shadow.querySelectorAll(`);
+    }  
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REPLACED:"+replacedContent);
+    return replacedContent;
+}
+
+
+
+function methodResolvedSyntax(p_method) {
+
+}
+function eventResolvedSyntax(p_event) {
+
+}
+function propertyResolvedSyntax(p_prop) {
+
+}
+
+
+function customComponents(p_fromDirPath) {
     const files = fs.readdirSync(p_fromDirPath);
     files.forEach((file) => {
         if (file == "node_modules") return;
@@ -289,18 +392,19 @@ function customComponents(p_fromDirPath) {
         if (info.isDirectory()) {
             customComponents(filePath);
         }
-        else if (file.endsWith('-wok.html')) {
 
+        if (file.endsWith('-wok.html')) {
             //----------------------------------------------
             // Get the script, div, and style parts
             //----------------------------------------------
-            const buffer = fs.readFileSync(filePath).toString();
+            let buffer = fs.readFileSync(filePath).toString();
             G.componentName = buffer.match(/<.*-wok/)[0].split('<')[1];
+            buffer = resolvedSyntax(buffer, true, G.componentName);
             G.script = buffer.split('<script>')[1].split('</script>')[0];
             G.divTemplate = buffer.match(/<.*-wok>([\s\S]*)<\/.*-wok>/)[1];
             G.styleTemplate = buffer.split('<style>')[1].split('</style>')[0];
 
-            /* puts this. in front of members */
+            /* puts this._ in front of members */
             G.divTemplate = G.divTemplate.replace(/\$\{.*?\}/g, (match) => {
                 return match.replace(/_/g, 'this._');
             });
@@ -331,6 +435,14 @@ function customComponents(p_fromDirPath) {
             G.events.forEach(event => {
                 out(event)
             });
+            out('bornFunc---------------------bornEvents');
+            G.bornEvents.forEach(event => {
+                out(event)
+            });
+            out('deathFunc---------------------deathEvents');
+            G.deathEvents.forEach(event => {
+                out(event)
+            });
             out('methods---------------------methods');
             G.methods.forEach(method => {
                 out(method)
@@ -351,7 +463,6 @@ function customComponents(p_fromDirPath) {
                 constructor() {
                     super();
                     this.shadow = this.attachShadow({mode: 'open'});
-                    ${addComponentBasedEventListeners(G.events)}
                 }
 
                 render() {   
@@ -376,14 +487,20 @@ function customComponents(p_fromDirPath) {
                     this.mutationObserver = new MutationObserver(this.mutationObserverCallback.bind(this));
                     this.mutationObserver.observe(this, { attributes: true, attributeOldValue : true });
                     this.render();
+                    /* events are added after the render so that the elements are in the DOM */
+                    setTimeout(() => {
+                        ${addEventListeners(G.events, G.componentName)}
+                    }, 0);
+                    ${addLifeCycleEvents(G.bornEvents)}
                 }
 
                 /* gets called when the element is removed from the DOM */
                 disconnectedCallback() {
+                    ${addLifeCycleEvents(G.deathEvents)}
                     this.mutationObserver.disconnect();
                 }
 
-                ${addMethods(G.methods)}
+                ${addMethods(G.methods, G.componentName)}
 
             }
 
@@ -391,7 +508,7 @@ function customComponents(p_fromDirPath) {
 
             out(customComponent);
             components.push(customComponent);
-        }//else if
+        }// if (file.endsWith('-wok.html'))
     });//files.forEach
     return components;
 }//customComponents function
