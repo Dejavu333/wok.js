@@ -129,13 +129,6 @@ class Visitor {
     // // }
 }
 
-// // const args = process.argv[2] // pull in the cmd line args
-// // if (!fs.existsSync(args) || !args.endsWith('-wok.html')) {
-// //     out('Error: File does not exist or is not a ???-wok.html file')
-// //     process.exit(1)
-// // }
-// // const buffer = fs.readFileSync(args).toString() //node index.js test/t-wok.html
-
 
 //==================================================================================
 // Main
@@ -189,11 +182,10 @@ function addGettersAndSetters(p_props) {
         let propValue = null;
         let propName = null;
         try {
+            propName = prop.split(' ')[1].split(';')[0];
             propValue = prop.split('=')[1].split(';')[0];
             propValue = propValue.replace(/_/g, "this._");
         } catch (error) { console.log(error) }
-
-        try { propName = prop.split(' ')[1].split(';')[0]; } catch (error) { console.log(error) }
 
         //--------------------------------------------------
         // Getter
@@ -202,8 +194,8 @@ function addGettersAndSetters(p_props) {
         /* if the property has no default value, then the getter will return the attribute value which can be set by the user in the html tag */
         if (!propValue) getterBody = `return this.getAttribute('${propName}');`;
         /* if the property has default value, then the getter will return the default value (it can be an expression) */
-        else if (propValue) getterBody = `
-        if(this.getAttribute('${propName}') == null) {this.setAttribute('${propName}', ${propValue});}
+        else if (propValue) getterBody = 
+        `this.setAttribute('${propName}', ${propValue});
         return this.getAttribute('${propName}');`;
 
         gettersAndSetters += `
@@ -465,10 +457,15 @@ function customComponents(p_fromDirPath) {
                     this.shadow = this.attachShadow({mode: 'open'});
                 }
 
-                render() {   
+                render() {   console.log("rendering")
                     this.styleTemplate =\`<style>${G.styleTemplate}</style>\`;
                     this.divTemplate =\`${G.divTemplate}\`;
                     this.shadow.innerHTML = this.styleTemplate + this.divTemplate;
+                    /* so that the elements are already in the DOM */
+                    setTimeout(() => {
+                        ${addEventListeners(G.events, G.componentName)}
+                    }, 0);
+                    ${addLifeCycleEvents(G.bornEvents)}
                 }
 
                 /* gets called when an attribute is changed */
@@ -487,11 +484,6 @@ function customComponents(p_fromDirPath) {
                     this.mutationObserver = new MutationObserver(this.mutationObserverCallback.bind(this));
                     this.mutationObserver.observe(this, { attributes: true, attributeOldValue : true });
                     this.render();
-                    /* events are added after the render so that the elements are in the DOM */
-                    setTimeout(() => {
-                        ${addEventListeners(G.events, G.componentName)}
-                    }, 0);
-                    ${addLifeCycleEvents(G.bornEvents)}
                 }
 
                 /* gets called when the element is removed from the DOM */
