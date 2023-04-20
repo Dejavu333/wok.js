@@ -460,7 +460,66 @@ function customComponents(p_fromDirPath) {
                 render() {   console.log("rendering")
                     this.styleTemplate =\`<style>${G.styleTemplate}</style>\`;
                     this.divTemplate =\`${G.divTemplate}\`;
-                    this.shadow.innerHTML = this.styleTemplate + this.divTemplate;
+
+                let newHTML = this.styleTemplate + this.divTemplate;
+                console.log("sh:"+this.shadow.innerHTML);
+                if (this.shadow.innerHTML!=="") {console.log(updateInnerHTML(this.shadow, newHTML));}
+                else this.shadow.innerHTML = newHTML;
+
+                function updateInnerHTML(oldDiv, newHTML) {
+                  
+                    const newDiv = document.createElement('div');
+                    newDiv.innerHTML = newHTML;
+                  
+                    // Loop through each child node of the new div and compare it to the corresponding node in the old HTML
+                    for (let i = 0; i < newDiv.childNodes.length; i++) {
+                      const newNode = newDiv.childNodes[i];
+                      const oldNode = findMatchingNode(oldDiv, newNode);
+                  
+                      if (!oldNode) {
+                        // If the node doesn't exist in the old HTML, add the new node to the end of the old HTML
+                        oldDiv.appendChild(newNode.cloneNode(true));
+                      } else if (newNode.nodeName !== '#text' && newNode.outerHTML !== oldNode.outerHTML) {
+                        // If the nodes are different, replace the old node with the new node
+                        oldNode.parentNode.replaceChild(newNode.cloneNode(true), oldNode);
+                      } else if (newNode.nodeName === '#text' && newNode.textContent !== oldNode.textContent) {
+                        // If the text content is different, update the old node's text content
+                        oldNode.textContent = newNode.textContent;
+                      }
+                    }
+                  
+                    // Return the updated HTML string
+                    return oldDiv.innerHTML;
+                  }
+                  
+                  function findMatchingNode(container, node) {
+                    // Find a node in the container that matches the given node's tag name and attributes
+                    for (let i = 0; i < container.childNodes.length; i++) {
+                      const childNode = container.childNodes[i];
+                      if (childNode.nodeName === node.nodeName && nodesHaveSameAttributes(childNode, node)) {
+                        return childNode;
+                      }
+                    }
+                    return null;
+                  }
+                  
+                  function nodesHaveSameAttributes(node1, node2) {
+                    // Compare the attributes of two nodes and return true if they match
+                    const attrs1 = node1.attributes;
+                    const attrs2 = node2.attributes;
+                    if ((!attrs1 && !attrs2) || (attrs1.length !== attrs2.length)) {
+                      return false;
+                    }
+                    for (let i = 0; i < attrs1.length; i++) {
+                      const attr1 = attrs1[i];
+                      const attr2 = node2.getAttributeNode(attr1.name);
+                      if (!attr2 || attr2.value !== attr1.value) {
+                        return false;
+                      }
+                    }
+                    return true;
+                  }
+          
                     /* so that the elements are already in the DOM */
                     setTimeout(() => {
                         ${addEventListeners(G.events, G.componentName)}
