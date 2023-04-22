@@ -26,11 +26,15 @@ const G = {
 
     BORN_EVENT_LABEL: "born",
     DEATH_EVENT_LABEL: "death",
-    EVENT_LISTENER_LABELS: ["addEventListener", "on"]
+    EVENT_LISTENER_LABELS: ["addEventListener", "on"],
     //REACTIVE_SIGN
     //BUILD_DIR_PATH
     //SRC_DIR_PATH
     //COMPONENTS_DIR_PATH
+
+    flyWeight : {
+        funcHeadAndBodyObj: {funcHead: "", funcBody: ""}
+    }
 }
 const components = [];
 
@@ -157,7 +161,7 @@ function purgeDir(p_dirPath) {
     if (fs.existsSync(p_dirPath)) {
       fs.readdirSync(p_dirPath).forEach((file, index) => {
         const curPath = path.join(p_dirPath, file);
-        if (fs.lstatSync(curPath).isDirectory()) {
+        if (fs.existsSync(curPath) && fs.lstatSync(curPath).isDirectory()) {
           // Recursively deletes subdirectories
           purgeDir(curPath);
         } else {
@@ -165,8 +169,6 @@ function purgeDir(p_dirPath) {
           fs.unlinkSync(curPath);
         }
       });
-      // Deletes the empty directory
-      fs.rmdirSync(p_dirPath);
     }
 }
 
@@ -219,18 +221,47 @@ function addGettersAndSetters(p_props) {
     return gettersAndSetters;
 }
 
+function includesMoreThanOnce(str, substr) {
+    return str.indexOf(substr) !== str.lastIndexOf(substr);
+}
+
+function stringToNumberDigest(inputStr) {
+    const firstChar = inputStr[0];
+    const lastChar = inputStr[inputStr.length - 1];
+    const middleChars = inputStr.substr(Math.floor(inputStr.length / 2) - 1, 2);
+
+    const firstNum = firstChar.charCodeAt(0);
+    const lastNum = lastChar.charCodeAt(0);
+    const middleNum1 = middleChars.charCodeAt(0);
+    const middleNum2 = middleChars.charCodeAt(1);
+
+    const result = firstNum + lastNum + middleNum1 + middleNum2;
+    return result;
+}
+
 function addEventListeners(p_events, p_wokName) {
     let eventListeners = "";
+    let listener;
+    let handler;
+    let listenerId;
     p_events.forEach(event => {
         /* splits only at the first occurence of "addEventListener" */
         const eventListenerParts = event.split('.addEventListener',2);
-        let listener = eventListenerParts[0];
-        eventListenerParts[1]= eventListenerParts[1].replace(/(?<!\.)_/g,`document.querySelector('${p_wokName}')._`);
-        event = listener + ".addEventListener" + eventListenerParts[1];
+        listener = eventListenerParts[0];
+                
+        handler = ".addEventListener" + eventListenerParts[1];
+
+        /* if the listener is not the wok itself so select('example-wok').addEventListener(...), then the listener will be "this" */
+        if(includesMoreThanOnce(listener, p_wokName)) { listener = "this"; }
+ 
+        extractFuncHeadAndBody(handler, G.flyWeight)
+        handler = resolveFuncSyntax(G.flyWeight.funcHeadAndBodyObj, p_wokName);
+        listenerId = stringToNumberDigest(G.flyWeight.funcHeadAndBodyObj.funcBody);
+
         /* if the listener is the wok itself so select('example-wok').addEventListener(...), then the listener will be "this" */
-        // // let handler = ".addEventListener" + eventListenerParts[1];
-        const eventListenerWithCondition = `if(${listener}){
-            
+        event = listener + handler;
+        const eventListenerWithCondition = `if(${listener} && !${listener}[\`${listenerId}\`]){
+            ${listener}[\`${listenerId}\`] = true; // to prevent adding the same event listener more than once
             ${event}
         }`;
         eventListeners += eventListenerWithCondition;
@@ -248,17 +279,26 @@ function addLifeCycleEvents(p_lifeCycleEvents) {
     return lifeCycleEventsQuery;
 }
 
+function extractFuncHeadAndBody(p_funcString, p_flyWeight) {
+    let funcBodyParts = p_funcString.split('{',2);
+    p_flyWeight.funcHeadAndBodyObj.funcHead = funcBodyParts[0];
+    p_flyWeight.funcHeadAndBodyObj.funcBody = funcBodyParts[1];
+}
+
+function resolveFuncSyntax(p_funcHeadAndBodyObj, p_wokName) {
+    p_funcHeadAndBodyObj.funcBody = p_funcHeadAndBodyObj.funcBody.replace(/(?<!\.)_/g,`document.querySelector('${p_wokName}')._`);
+    return p_funcHeadAndBodyObj.funcHead + '{' + p_funcHeadAndBodyObj.funcBody;
+}
+
 function addMethods(p_methods, p_wokName) {
     let methodsString = "";
     p_methods.forEach(method => {
         method = method.replace('function', '');
-        methodParts = method.split('{',2);
-        methodParts[1]= methodParts[1].replace(/(?<!\.)_/g,`document.querySelector('${p_wokName}')._`);
-        methodsString +=( methodParts[0] + '{' + methodParts[1] );
+        extractFuncHeadAndBody(method, G.flyWeight);
+        methodsString += resolveFuncSyntax(G.flyWeight.funcHeadAndBodyObj, p_wokName);
     });
     return methodsString;
 }
-
 
 function copyFiles(p_fromDirectory, p_toDirectory) {
 
@@ -373,6 +413,12 @@ function propertyResolvedSyntax(p_prop) {
 
 }
 
+function reInitGlobals() {
+    G.events = [];
+    G.lifeCycleEvents = [];
+    G.methods = [];
+    G.props = [];
+}
 
 function customComponents(p_fromDirPath) {
     const files = fs.readdirSync(p_fromDirPath);
@@ -386,6 +432,7 @@ function customComponents(p_fromDirPath) {
         }
 
         if (file.endsWith('-wok.html')) {
+            reInitGlobals();
             //----------------------------------------------
             // Get the script, div, and style parts
             //----------------------------------------------
@@ -457,75 +504,76 @@ function customComponents(p_fromDirPath) {
                     this.shadow = this.attachShadow({mode: 'open'});
                 }
 
-                render() {   console.log("rendering")
+                render() {   
+                    console.log("rendering")
                     this.styleTemplate =\`<style>${G.styleTemplate}</style>\`;
                     this.divTemplate =\`${G.divTemplate}\`;
 
-                let newHTML = this.styleTemplate + this.divTemplate;
-                console.log("sh:"+this.shadow.innerHTML);
-                if (this.shadow.innerHTML!=="") {console.log(updateInnerHTML(this.shadow, newHTML));}
-                else this.shadow.innerHTML = newHTML;
+                    let newHTML = this.styleTemplate + this.divTemplate;
+                    if (this.shadow.innerHTML!=="") updateInnerHTML(this.shadow, newHTML);
+                    else this.shadow.innerHTML = newHTML;
 
-                function updateInnerHTML(oldDiv, newHTML) {
-                  
-                    const newDiv = document.createElement('div');
-                    newDiv.innerHTML = newHTML;
-                  
-                    // Loop through each child node of the new div and compare it to the corresponding node in the old HTML
-                    for (let i = 0; i < newDiv.childNodes.length; i++) {
-                      const newNode = newDiv.childNodes[i];
-                      const oldNode = findMatchingNode(oldDiv, newNode);
-                  
-                      if (!oldNode) {
-                        // If the node doesn't exist in the old HTML, add the new node to the end of the old HTML
-                        oldDiv.appendChild(newNode.cloneNode(true));
-                      } else if (newNode.nodeName !== '#text' && newNode.outerHTML !== oldNode.outerHTML) {
-                        // If the nodes are different, replace the old node with the new node
-                        oldNode.parentNode.replaceChild(newNode.cloneNode(true), oldNode);
-                      } else if (newNode.nodeName === '#text' && newNode.textContent !== oldNode.textContent) {
-                        // If the text content is different, update the old node's text content
-                        oldNode.textContent = newNode.textContent;
-                      }
+                    function updateInnerHTML(oldDiv, newHTML) {
+                    
+                        const newDiv = document.createElement('div');
+                        newDiv.innerHTML = newHTML;
+                    
+                        // Loop through each child node of the new div and compare it to the corresponding node in the old HTML
+                        for (let i = 0; i < newDiv.childNodes.length; i++) {
+                        const newNode = newDiv.childNodes[i];
+                        const oldNode = findMatchingNode(oldDiv, newNode);
+                    
+                        if (!oldNode) {
+                            // If the node doesn't exist in the old HTML, add the new node to the end of the old HTML
+                            if(typeof newNode.innerHTML === 'undefined') continue;
+                            oldDiv.appendChild(newNode);
+                        } else if (newNode.nodeName !== '#text' && newNode.outerHTML !== oldNode.outerHTML) {
+                            // If the nodes are different, replace the old node with the new node
+                            oldNode.parentNode.replaceChild(newNode, oldNode);
+                        } else if (newNode.nodeName === '#text' && newNode.textContent !== oldNode.textContent) {
+                            // If the text content is different, update the old node's text content
+                            oldNode.textContent = newNode.textContent;
+                        }
+                        }
+                    
+                        // Return the updated HTML string
+                        return oldDiv.innerHTML;
                     }
                   
-                    // Return the updated HTML string
-                    return oldDiv.innerHTML;
-                  }
-                  
-                  function findMatchingNode(container, node) {
-                    // Find a node in the container that matches the given node's tag name and attributes
-                    for (let i = 0; i < container.childNodes.length; i++) {
-                      const childNode = container.childNodes[i];
-                      if (childNode.nodeName === node.nodeName && nodesHaveSameAttributes(childNode, node)) {
-                        return childNode;
-                      }
+                    function findMatchingNode(container, node) {
+                        // Find a node in the container that matches the given node's tag name and attributes
+                        for (let i = 0; i < container.childNodes.length; i++) {
+                        const childNode = container.childNodes[i];
+                        if (childNode.nodeName === node.nodeName && nodesHaveSameAttributes(childNode, node)) {
+                            return childNode;
+                        }
+                        }
+                        return null;
                     }
-                    return null;
-                  }
                   
-                  function nodesHaveSameAttributes(node1, node2) {
-                    // Compare the attributes of two nodes and return true if they match
-                    const attrs1 = node1.attributes;
-                    const attrs2 = node2.attributes;
-                    if ((!attrs1 && !attrs2) || (attrs1.length !== attrs2.length)) {
-                      return false;
-                    }
-                    for (let i = 0; i < attrs1.length; i++) {
-                      const attr1 = attrs1[i];
-                      const attr2 = node2.getAttributeNode(attr1.name);
-                      if (!attr2 || attr2.value !== attr1.value) {
+                    function nodesHaveSameAttributes(node1, node2) {
+                        // Compare the attributes of two nodes and return true if they match
+                        const attrs1 = node1.attributes;
+                        const attrs2 = node2.attributes;
+                        if ((!attrs1 && !attrs2) || (attrs1.length !== attrs2.length)) {
                         return false;
-                      }
+                        }
+                        for (let i = 0; i < attrs1.length; i++) {
+                        const attr1 = attrs1[i];
+                        const attr2 = node2.getAttributeNode(attr1.name);
+                        if (!attr2 || attr2.value !== attr1.value) {
+                            return false;
+                        }
+                        }
+                        return true;
                     }
-                    return true;
-                  }
           
                     /* so that the elements are already in the DOM */
                     setTimeout(() => {
                         ${addEventListeners(G.events, G.componentName)}
                     }, 0);
                     ${addLifeCycleEvents(G.bornEvents)}
-                }
+                }//render() ends
 
                 /* gets called when an attribute is changed */
                 mutationObserverCallback(mutationList, observer) {
@@ -562,4 +610,4 @@ function customComponents(p_fromDirPath) {
         }// if (file.endsWith('-wok.html'))
     });//files.forEach
     return components;
-}//customComponents function
+}//customComponents() ends
