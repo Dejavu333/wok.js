@@ -52,7 +52,7 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
 
     _selectAll --> document.querySelectorAll_
   
-### `<somename-wok>` is responsible for the structure of your component
+### `<example-wok>` is responsible for the structure of your component
 
   * _You can render the value of your reactive props like ${_nameOfmyProp}.__
   
