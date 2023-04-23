@@ -14,60 +14,95 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
 
 ### `<script>` is responsible for behaviour and state
   
-  * _You can initialize reactive properties using '\_'_
+  <details>
+  <summary>You can initialize reactive properties using '_'</summary>
   
-    ![image](https://user-images.githubusercontent.com/89163562/233832401-f9d6f5d3-b934-4a96-81cb-d3c009c3630e.png)
+  ![image](https://user-images.githubusercontent.com/89163562/233832401-f9d6f5d3-b934-4a96-81cb-d3c009c3630e.png)
   
-    _and then modify them dynamically in the html tag_
-    ![image](https://user-images.githubusercontent.com/89163562/233831801-21ded63d-2370-4958-a8fa-687e9691749a.png)
-    _or via code._
-  ![image](https://user-images.githubusercontent.com/89163562/233832745-658925c1-6e51-4ac4-8372-4ee996a6de43.png)
-
-
-  * _You can define methods using '\_'_
+  and then modify them dynamically in the html tag
+  ![image](https://user-images.githubusercontent.com/89163562/233831801-21ded63d-2370-4958-a8fa-687e9691749a.png)
   
-    ![image](https://user-images.githubusercontent.com/89163562/233833017-4d95976d-a8a3-4722-85ae-da3f0abf6e8d.png)
+  or via code.
+  ![image](https://user-images.githubusercontent.com/89163562/233832745-658925c1-6e51-4ac4-8372-4ee996a6de43.png) 
+  </details>
 
-    _and then invoke them using dot notation._
-    ![image](https://user-images.githubusercontent.com/89163562/233831666-3edfca1a-57e5-4f4f-9c02-63936cd1eb26.png)
 
 
-  * _You can define event listeners on any element of your wok using '.on' or '.addEventListener'_
+  <details>
+  <summary>You can define methods using '_'</summary> 
+  
+  ![image](https://user-images.githubusercontent.com/89163562/233833017-4d95976d-a8a3-4722-85ae-da3f0abf6e8d.png)
 
-  * _You can add your woks programically to the DOM as you would do with any other html element._
+  and then invoke them using dot notation.
+  ![image](https://user-images.githubusercontent.com/89163562/233831666-3edfca1a-57e5-4f4f-9c02-63936cd1eb26.png)
+  </details>
+  
+
+
+  <details>
+  <summary>You can define event listeners on any element of your wok using '.on' or '.addEventListener'</summary>
+  </details>
     
-    const w = document.createElement('example-wok');
     
-    document.body.appendChild(w);
+    
+  <details>
+  <summary>You can add your woks programically to the DOM as you would do with any other html element.</summary>
 
-  * _You can define lifecycle events using the 'born' or 'death' as arguments._
-
-  * _Syntax (either can be used):_
-
-    _.on --> .addEventListener_
-
-    _.off --> .removeEventListener_
-
-    _select --> document.querySelector_
-
-    _selectAll --> document.querySelectorAll_
+  ``` js
+  const w = createElement('example-wok');   //or document.createElement('example-wok');
+  select('body').appendChild(w);            //or document.body.appendChild(w);
   
-### `<example-wok>` is responsible for the structure of your component
-
-  * _You can render the value of your reactive props like ${_nameOfmyProp}.__
+  select('example-wok').remove();           //or w.remove();
+  ``` 
+  </details>
   
-    ![image](https://user-images.githubusercontent.com/89163562/233833229-cdde07b1-a764-456f-8840-60e245b1526e.png)
-
-
-  * _You can nest other woks inside your wok._
   
-    ![image](https://user-images.githubusercontent.com/89163562/233833293-f2ecea32-fe1c-406b-964e-28062ebfb413.png)
-
   
+  <details>
+  <summary>You can define lifecycle events using the 'born' or 'death' as arguments.</summary>
+  </details>
+
+
+
+  <details>
+  <summary>Syntax (either can be used):</summary>
+  
+  ```
+  .on       --> .addEventListener
+
+  .off      --> .removeEventListener
+
+  select    --> document.querySelector
+
+  selectAll --> document.querySelectorAll
+  ```
+  </details>  
+  
+  
+  
+### `<example-wok>` is responsible for the structure
+  
+  <details>
+  <summary>You can render your reactive props like this ${_nameOfmyProp}.</summary>
+  
+  ![image](https://user-images.githubusercontent.com/89163562/233833229-cdde07b1-a764-456f-8840-60e245b1526e.png)
+  </details>
+
+    
+    
+  <details>
+  <summary>You can nest other woks inside your wok</summary>
+  
+  ![image](https://user-images.githubusercontent.com/89163562/233833293-f2ecea32-fe1c-406b-964e-28062ebfb413.png)
+  </details>
+  
+    
+    
 ### `<style>` is responsible for the appearance
-
-  * _You can render the value of your reactive props like ${_nameOfmyProp}.__
-
+    
+  <details>
+  <summary>You can render the value of your reactive props like ${_nameOfmyProp}</summary>
+  </details>
 
 # todo
 ✔ rebuild the component on save, so we don't have to 'npm run fry' every time, we make a change 
