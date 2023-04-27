@@ -381,7 +381,8 @@ function resolvedSyntax(p_content, p_isWok, p_wokName) {
     .replace(/\.on\(/g, '.addEventListener(')
     .replace(/\.off\(/g, '.removeEventListener(')
     .replace(/\.select\(/g, '.querySelector(')
-    .replace(/\.selectAll\(/g, '.querySelectorAll(');
+    .replace(/\.selectAll\(/g, '.querySelectorAll(')
+    .replace(/createElement\(/g, `document.createElement(`);
 
     if (!p_isWok) {
         // select -> document.querySelector
@@ -397,7 +398,6 @@ function resolvedSyntax(p_content, p_isWok, p_wokName) {
         .replace(/select\(/g, `document.querySelector('${p_wokName}').shadow.querySelector(`)
         .replace(/selectAll\(/g, `document.querySelector('${p_wokName}').shadow.querySelectorAll(`);
     }  
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REPLACED:"+replacedContent);
     return replacedContent;
 }
 
@@ -443,13 +443,15 @@ function customComponents(p_fromDirPath) {
             G.divTemplate = buffer.match(/<.*-wok>([\s\S]*)<\/.*-wok>/)[1];
             G.styleTemplate = buffer.split('<style>')[1].split('</style>')[0];
 
-            /* puts this._ in front of members */
+            // resolves divTemplate and styleTemplate syntax
             G.divTemplate = G.divTemplate.replace(/\$\{.*?\}/g, (match) => {
                 return match.replace(/_/g, 'this._');
             });
             G.styleTemplate = G.styleTemplate.replace(/\$\{.*?\}/g, (match) => {
                 return match.replace(/_/g, 'this._');
             });
+            const regex = new RegExp(G.componentName+"-wok", 'g');
+            G.styleTemplate = G.styleTemplate.replace(regex, ':host');
 
             //----------------------------------------------
             // Lexical analysis, Parsing to AST
