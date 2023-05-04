@@ -10,8 +10,40 @@
 
     <body>
         
-        <example-wok _x="10" _color="blue">
+        <example-wok id="first" _x="10" _color="blue" _title="wok1"></example-wok>
+        <example-wok id="second" _x="10" _color="green" _title="wok2"></example-wok>
 
+    <script>
+        //call methods defined in the wok
+        select("example-wok")._greet();
+
+        //update reactive props
+        const selectedWok = select("example-wok");
+        selectedWok._x=5;
+
+        //use select instead of document.querySelector()
+        select("#first")._greet();
+        select("#second")._greet();
+        selectAll("example-wok").forEach((wok) => {
+            wok._greet();
+        });
+
+        //create woks dynamically
+        let wok = createElement("example-wok");
+        wok._x = 20;
+        wok._color = "red";
+        wok._title = "wok3";
+        document.body.appendChild(wok); //triggers the born event
+        //wok.remove(); //triggers the death event
+
+        //define classic events outside the wok
+        select("#first").on("click", () => {
+            console.log("wok was clicked! (defined outside wok)");
+        });
+        select("#first").shadow.select("h1").on("click", () => {
+            console.log("h1 was clicked! (defined outside wok)");
+        });
+    </script>
     </body>
 
 </html>

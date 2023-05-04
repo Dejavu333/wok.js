@@ -1,13 +1,44 @@
 <script>
+    //reactive props
     let _x;
     let _y = 10 * _x;
     let _z = Math.sqrt(_y);
-    let _color = "green";
+    let _color;
+    let _title;
+
+
+    //methods
+    function _greet() {
+        console.log("hello world!");
+    }
+
+
+    //classic events
+    //on the wok itself
+    select("example-wok").on("click", () => {
+        console.log("wok was clicked! (defined inside wok)");
+    });
+    //on elements inside the wok
+    select("h1").on("click", () => {
+        console.log("h1 was clicked! (defined inside wok)");
+    });
+
+
+    //lifecycle events
+    select("example-wok").on("born", () => {
+        console.log("wok was born!");
+        select("example-wok")._greet();
+        //or
+        _greet();
+    });
+    select("example-wok").on("death", () => {
+        console.log("wok died!");
+    });
 </script>
 
 
 <example-wok>
-    <h1>wok</h1>
+    <h1>${_title}</h1>
     <lu>
         <li>${_x}</li>
         <li>${_y}</li>
@@ -18,12 +49,12 @@
 
 
 <style>
-    :host {
+    example-wok {
         display: block;
         height: 10%;
-        width: 20%;
-        border: 4px solid black;
+        width: 30%;
         padding: 10px;
+        border: solid 2px black;
     }
     h1 {
         color: ${_color};

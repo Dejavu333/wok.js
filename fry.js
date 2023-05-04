@@ -187,7 +187,7 @@ function addGettersAndSetters(p_props) {
             propName = prop.split(' ')[1].split(';')[0];
             propValue = prop.split('=')[1].split(';')[0];
             propValue = propValue.replace(/_/g, "this._");
-        } catch (error) { console.log(error) }
+        } catch (error) { out("split failed, there was no init only decl") }
 
         //--------------------------------------------------
         // Getter
@@ -235,7 +235,7 @@ function stringToNumberDigest(inputStr) {
     const middleNum1 = middleChars.charCodeAt(0);
     const middleNum2 = middleChars.charCodeAt(1);
 
-    const result = firstNum + lastNum + middleNum1 + middleNum2;
+    const result = firstNum + lastNum + middleNum1 + middleNum2 + inputStr.length;
     return result;
 }
 
@@ -253,6 +253,10 @@ function addEventListeners(p_events, p_wokName) {
 
         /* if the listener is not the wok itself so select('example-wok').addEventListener(...), then the listener will be "this" */
         if(includesMoreThanOnce(listener, p_wokName)) { listener = "this"; }
+        if(listener.includes(p_wokName)) {
+            listener = listener.replace(new RegExp(`select\\(['|"]${p_wokName}['|"]\\)`, 'g'), "this");
+            listener = listener.replace(new RegExp(`document.querySelector\\(['|"]${p_wokName}['|"]\\)`, 'g'), "this");
+        }
  
         extractFuncHeadAndBody(handler, G.flyWeight)
         handler = resolveFuncSyntax(G.flyWeight.funcHeadAndBodyObj, p_wokName);
@@ -269,10 +273,12 @@ function addEventListeners(p_events, p_wokName) {
     return eventListeners;
 }
 
-function addLifeCycleEvents(p_lifeCycleEvents) {
+function addLifeCycleEvents(p_lifeCycleEvents, p_wokName) {
     let lifeCycleEventsQuery = "";
     if (p_lifeCycleEvents.length > 0) {
       p_lifeCycleEvents.forEach(event => {
+        extractFuncHeadAndBody(event, G.flyWeight);
+        event = resolveFuncSyntax(G.flyWeight.funcHeadAndBodyObj, p_wokName);
         lifeCycleEventsQuery +=`(${event})();` ;
       });
     }
@@ -394,7 +400,10 @@ function resolvedSyntax(p_content, p_isWok, p_wokName) {
         // select -> this.shadowRoot.querySelector
         // selectAll -> this.shadowRoot.querySelectorAll
         replacedContent = replacedContent
-         // .replace(/(?<!\.)/g, `document.querySelector('${p_wokName}')._`) //if the _ is not preceded by a dot
+        //inside a wok every select of the wok should be replaced with this
+        .replace(new RegExp(`select\\(['|"]${p_wokName}['|"]\\)`, 'g'), "this")
+        .replace(new RegExp(`document.querySelector\\(['|"]${p_wokName}['|"]\\)`, 'g'), "this")
+        //and every select aside from the wok should be replaced with this.shadowRoot because we target the elements inside the wok
         .replace(/select\(/g, `document.querySelector('${p_wokName}').shadow.querySelector(`)
         .replace(/selectAll\(/g, `document.querySelector('${p_wokName}').shadow.querySelectorAll(`);
     }  
@@ -458,7 +467,7 @@ function customComponents(p_fromDirPath) {
             //----------------------------------------------
             const ast = esprisma.parseScript(G.script).body
             out("AST----------------------------------AST")
-            out(ast);
+            // // out(ast);
 
             //----------------------------------------------
             // Interpreting the AST
@@ -574,7 +583,7 @@ function customComponents(p_fromDirPath) {
                     setTimeout(() => {
                         ${addEventListeners(G.events, G.componentName)}
                     }, 0);
-                    ${addLifeCycleEvents(G.bornEvents)}
+                    
                 }//render() ends
 
                 /* gets called when an attribute is changed */
@@ -584,6 +593,7 @@ function customComponents(p_fromDirPath) {
                         && mutation.attributeName.startsWith('_')
                         && mutation.oldValue !== mutation.target.getAttribute(mutation.attributeName)) {
                             this.render();
+                            ${addLifeCycleEvents(G.bornEvents, G.componentName)}
                         }
                     }
                 }
@@ -597,7 +607,7 @@ function customComponents(p_fromDirPath) {
 
                 /* gets called when the element is removed from the DOM */
                 disconnectedCallback() {
-                    ${addLifeCycleEvents(G.deathEvents)}
+                    ${addLifeCycleEvents(G.deathEvents, G.componentName)}
                     this.mutationObserver.disconnect();
                 }
 
@@ -607,7 +617,7 @@ function customComponents(p_fromDirPath) {
 
             customElements.define('${G.componentName}', ${className});`;
 
-            out(customComponent);
+            // out(customComponent);
             components.push(customComponent);
         }// if (file.endsWith('-wok.html'))
     });//files.forEach
