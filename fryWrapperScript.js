@@ -10,7 +10,7 @@ let calleePath = __dirname;
 //todo should handle the case where the user is in the _src directory or the _build directory or the deeper
 
 const nodemonCommand = `npx nodemon --watch "${callerPath}/_src" --ext html,js,css --ignore node_modules fry.js "${callerPath}"`;
-const liveServerCommand = `npx live-server "${callerPath}" --port=8080 --open="/_build/index.html"`;
+const liveServerCommand = `npx live-server "${callerPath}/_build/index.html" --watch="${callerPath}/_build/index.html" --port=8080 --open="${callerPath}/_build/index.html"`;
 
 
 // Execute the commands sequentially

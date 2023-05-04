@@ -166,7 +166,7 @@ function purgeDir(p_dirPath) {
           purgeDir(curPath);
         } else {
           // Deletes file
-          fs.unlinkSync(curPath);
+          if (file !== "index.html") fs.unlinkSync(curPath);
         }
       });
     }
@@ -450,7 +450,7 @@ function customComponents(p_fromDirPath) {
             G.styleTemplate = G.styleTemplate.replace(/\$\{.*?\}/g, (match) => {
                 return match.replace(/_/g, 'this._');
             });
-            const regex = new RegExp(G.componentName+"-wok", 'g');
+            const regex = new RegExp(G.componentName, 'g');
             G.styleTemplate = G.styleTemplate.replace(regex, ':host');
 
             //----------------------------------------------
