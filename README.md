@@ -24,9 +24,9 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   
   ```html
   <script>
-    let _x;
-    let _y = 10 * _x;
-    let _title;
+      let _x;
+      let _y = 10 * _x;
+      let _title;
   </script>
   ```
   
@@ -56,12 +56,12 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   ```js
   // on the wok itself
   this.on("click", () => {    // or select("example-wok).on
-    console.log("wok was clicked! (defined inside wok)");
+      console.log("wok was clicked! (defined inside wok)");
   });
 
   // on elements inside the wok
   select("h1").on("click", () => {
-    console.log("h1 was clicked! (defined inside wok)");
+      console.log("h1 was clicked! (defined inside wok)");
   });
   ``` 
   </details>
@@ -86,12 +86,12 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   
   ```js
   select("example-wok").on("born", () => {
-    console.log("wok was born!");
-    _greet();
+      console.log("wok was born!");
+      _greet();
   });
 
   select("example-wok").on("death", () => {
-    console.log("wok died!");
+      console.log("wok died!");
   });
   ``` 
   </details>
@@ -119,15 +119,15 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
 ### `<example-wok>` is responsible for the structure
 
   <details>
-  <summary>You can render reactive props using interpolation syntax ${_nameOfmyProp}.</summary>
+  <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}.</summary>
   
   ```html
   <example-wok>
-    <lu>
-      <li>${_x}</li>
-      <li>${_y}</li>
-      <li>${_x / _y}</li>
-    </lu>
+      <lu>
+          <li>${_x}</li>
+          <li>${_y}</li>
+          <li>${_x / _y}</li>
+      </lu>
   </example-wok>
 ```
   </details>
@@ -139,9 +139,9 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   
   ```html
   <example-wok>
-    <nested-wok title=${_myTitle}></nested-wok>
+      <nested-wok title=${_myTitle}></nested-wok>
   </example-wok>
-```
+  ```
   </details>
   
     
@@ -149,7 +149,19 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
 ### `<style>` is responsible for the appearance
     
   <details>
-  <summary>You can render the value of your reactive props like ${_nameOfmyProp}</summary>
+  <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}</summary>
+  
+  ```html
+  <style>
+      example-wok {
+          display: block;
+          border: solid 2px black;
+      }
+      h1 {
+          color: ${_color};
+      };
+  </style>
+  ```
   </details>
 
 # todo
