@@ -30,10 +30,10 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   </script>
   ```
   
-  and then modify them dynamically in index.html
+  and then modify them dynamically with html
   ![image](https://user-images.githubusercontent.com/89163562/233831801-21ded63d-2370-4958-a8fa-687e9691749a.png)
   
-  or via code.
+  or with js.
   ![image](https://user-images.githubusercontent.com/89163562/233832745-658925c1-6e51-4ac4-8372-4ee996a6de43.png) 
   </details>
 
@@ -55,13 +55,13 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   
   ```js
   // on the wok itself
-  this.on("click", () => {    // or select("example-wok).on
-      console.log("wok was clicked! (defined inside wok)");
+  this.on('click', () => {    // or select('example-wok').on
+      console.log("wok was clicked!");
   });
 
   // on elements inside the wok
-  select("h1").on("click", () => {
-      console.log("h1 was clicked! (defined inside wok)");
+  select('h1').on('click', () => {
+      console.log('h1 was clicked!');
   });
   ``` 
   </details>
@@ -85,13 +85,13 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   <summary>You can define lifecycle events using 'born' or 'death' as arguments.</summary>
   
   ```js
-  select("example-wok").on("born", () => {
-      console.log("wok was born!");
+  select('example-wok').on('born', () => {
+      console.log('wok was born!');
       _greet();
   });
 
-  select("example-wok").on("death", () => {
-      console.log("wok died!");
+  select('example-wok').on('death', () => {
+      console.log('wok died!');
   });
   ``` 
   </details>
@@ -176,3 +176,7 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
 ? find a way to run the app from memory, and only build it when we want to deploy it
 
 ? templating language
+
+? >selectors> for wok inner elements
+
+? attrs as parameters in createElement()
