@@ -11,8 +11,9 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
 **`fry`** _starts your wok.js application_
 
 # how to use
-In the _woks folder there are your custom reusable components.
-In the _build folder the parsed code resides, you can deploy it as you would deploy a vanilla html/css/js project.
+In the **_woks** folder there are your custom reusable components.
+
+In the **_build** folder the parsed code resides, you can deploy it as you would deploy a vanilla project.
 
 ![image](https://user-images.githubusercontent.com/89163562/236686733-bb5e3cc8-7829-4abd-928a-b57063d98d2f.png)
 ![image](https://user-images.githubusercontent.com/89163562/236688732-ff88575b-4a34-4b99-8038-32776552075d.png)
@@ -69,7 +70,7 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
     
     
   <details>
-  <summary>You can add your woks programically to the DOM as you would do with any other html element.</summary>
+  <summary>You can add your woks programically to the DOM</summary>
 
   ```js
   const w = createElement('example-wok');   // or document.createElement('example-wok');
@@ -82,7 +83,7 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
   
   
   <details>
-  <summary>You can define lifecycle events using 'born' or 'death' as arguments.</summary>
+  <summary>You can define lifecycle events using 'born' or 'death' as arguments</summary>
   
   ```js
   select('example-wok').on('born', () => {
@@ -99,7 +100,7 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
 
 
   <details>
-  <summary>Syntax (either can be used):</summary>
+  <summary>Syntax (either can be used)</summary>
   
   ```
   .on           --> .addEventListener
@@ -119,7 +120,7 @@ In the _build folder the parsed code resides, you can deploy it as you would dep
 ### `<example-wok>` is responsible for the structure
 
   <details>
-  <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}.</summary>
+  <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}</summary>
   
   ```html
   <example-wok>
