@@ -117,7 +117,7 @@ In the **_build** folder the parsed code resides, you can deploy it as you would
   
   
   
-### `<example-wok>` is responsible for the structure
+### `<example-wok>` is responsible for structure
 
   <details>
   <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}</summary>
@@ -147,7 +147,7 @@ In the **_build** folder the parsed code resides, you can deploy it as you would
   
     
     
-### `<style>` is responsible for the appearance
+### `<style>` is responsible for appearance
     
   <details>
   <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}</summary>
