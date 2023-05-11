@@ -181,3 +181,5 @@ In the **_build** folder the parsed code resides, you can deploy it as you would
 ? >selectors> for wok inner elements
 
 ? attrs as parameters in createElement()
+
+? live-server should send refresh msg to the websocket only once after code parsing
