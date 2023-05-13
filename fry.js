@@ -593,7 +593,6 @@ function customComponents(p_fromDirPath) {
                         && mutation.attributeName.startsWith('_')
                         && mutation.oldValue !== mutation.target.getAttribute(mutation.attributeName)) {
                             this.render();
-                            ${addLifeCycleEvents(G.bornEvents, G.componentName)}
                         }
                     }
                 }
@@ -603,6 +602,7 @@ function customComponents(p_fromDirPath) {
                     this.mutationObserver = new MutationObserver(this.mutationObserverCallback.bind(this));
                     this.mutationObserver.observe(this, { attributes: true, attributeOldValue : true });
                     this.render();
+                    ${addLifeCycleEvents(G.bornEvents, G.componentName)}
                 }
 
                 /* gets called when the element is removed from the DOM */
