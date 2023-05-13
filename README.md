@@ -11,18 +11,30 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
 **`fry`** _starts your wok.js application_
 
 # how to use
+In the **_woks** folder there are your custom reusable components.
+
+In the **_build** folder the parsed code resides, you can deploy it as you would deploy a vanilla project.
+
+![image](https://user-images.githubusercontent.com/89163562/236686733-bb5e3cc8-7829-4abd-928a-b57063d98d2f.png)
+![image](https://user-images.githubusercontent.com/89163562/236688732-ff88575b-4a34-4b99-8038-32776552075d.png)
+
 
 ### `<script>` is responsible for behaviour and state
-  
   <details>
   <summary>You can initialize reactive properties using '_'</summary>
   
-  ![image](https://user-images.githubusercontent.com/89163562/233832401-f9d6f5d3-b934-4a96-81cb-d3c009c3630e.png)
+  ```html
+  <script>
+      let _x;
+      let _y = 10 * _x;
+      let _title;
+  </script>
+  ```
   
-  and then modify them dynamically in the html tag
+  and then modify them dynamically with html
   ![image](https://user-images.githubusercontent.com/89163562/233831801-21ded63d-2370-4958-a8fa-687e9691749a.png)
   
-  or via code.
+  or with js.
   ![image](https://user-images.githubusercontent.com/89163562/233832745-658925c1-6e51-4ac4-8372-4ee996a6de43.png) 
   </details>
 
@@ -41,51 +53,84 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
 
   <details>
   <summary>You can define event listeners on any element of your wok using '.on' or '.addEventListener'</summary>
+  
+  ```js
+  // on the wok itself
+  this.on('click', () => {    // or select('example-wok').on
+      console.log("wok was clicked!");
+  });
+
+  // on elements inside the wok
+  select('h1').on('click', () => {
+      console.log('h1 was clicked!');
+  });
+  ``` 
   </details>
     
     
     
   <details>
-  <summary>You can add your woks programically to the DOM as you would do with any other html element.</summary>
+  <summary>You can add your woks programically to the DOM</summary>
 
-  ``` js
-  const w = createElement('example-wok');   //or document.createElement('example-wok');
-  select('body').appendChild(w);            //or document.body.appendChild(w);
+  ```js
+  const w = createElement('example-wok');   // or document.createElement('example-wok');
+  select('body').appendChild(w);            // or document.body.appendChild(w);
   
-  select('example-wok').remove();           //or w.remove();
+  select('example-wok').remove();           // or w.remove();
   ``` 
   </details>
   
   
   
   <details>
-  <summary>You can define lifecycle events using the 'born' or 'death' as arguments.</summary>
+  <summary>You can define lifecycle events using 'born' or 'death' as arguments</summary>
+  
+  ```js
+  select('example-wok').on('born', () => {
+      console.log('wok was born!');
+      _greet();
+  });
+
+  select('example-wok').on('death', () => {
+      console.log('wok died!');
+  });
+  ``` 
   </details>
 
 
 
   <details>
-  <summary>Syntax (either can be used):</summary>
+  <summary>Syntax (either can be used)</summary>
   
   ```
-  .on       --> .addEventListener
+  .on           --> .addEventListener
 
-  .off      --> .removeEventListener
+  .off          --> .removeEventListener
 
-  select    --> document.querySelector
+  select        --> document.querySelector
 
-  selectAll --> document.querySelectorAll
+  selectAll     --> document.querySelectorAll
+  
+  createElement --> document.createElement
   ```
   </details>  
   
   
   
-### `<example-wok>` is responsible for the structure
-  
+### `<example-wok>` is responsible for structure
+
   <details>
-  <summary>You can render your reactive props like this ${_nameOfmyProp}.</summary>
+  <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}</summary>
   
-  ![image](https://user-images.githubusercontent.com/89163562/233833229-cdde07b1-a764-456f-8840-60e245b1526e.png)
+  ```html
+  <example-wok>
+      <lu>
+          <li>${_x}</li>
+          <li>${_y}</li>
+          <li>${_x / _y}</li>
+      </lu>
+  </example-wok>
+```
   </details>
 
     
@@ -93,15 +138,31 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
   <details>
   <summary>You can nest other woks inside your wok</summary>
   
-  ![image](https://user-images.githubusercontent.com/89163562/233833293-f2ecea32-fe1c-406b-964e-28062ebfb413.png)
+  ```html
+  <example-wok>
+      <nested-wok title=${_myTitle}></nested-wok>
+  </example-wok>
+  ```
   </details>
   
     
     
-### `<style>` is responsible for the appearance
+### `<style>` is responsible for appearance
     
   <details>
-  <summary>You can render the value of your reactive props like ${_nameOfmyProp}</summary>
+  <summary>You can render reactive props using the interpolation syntax ${_nameOfmyProp}</summary>
+  
+  ```html
+  <style>
+      example-wok {
+          display: block;
+          border: solid 2px black;
+      }
+      h1 {
+          color: ${_color};
+      };
+  </style>
+  ```
   </details>
 
 # todo
@@ -116,3 +177,9 @@ Minimalist component framework instead of Angular, React, Vue, Solid, Svelte, Li
 ? find a way to run the app from memory, and only build it when we want to deploy it
 
 ? templating language
+
+? >selectors> for wok inner elements
+
+? attrs as parameters in createElement()
+
+? live-server should send refresh msg to the websocket only once after code parsing
